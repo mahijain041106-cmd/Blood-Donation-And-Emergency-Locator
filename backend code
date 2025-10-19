@@ -1,1 +1,619 @@
-# Blood-Donation-And-Emergency-Locator
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+struct node
+{
+    int id;
+    char name[50];
+    long long contact;
+    char gender[10];
+    char blood_group[5];
+    char city[20];
+    char availability[10];
+    struct node *next;
+};
+struct node *head=NULL;
+struct node *createnode(struct node *n1)
+{
+    struct node *temp = (struct node *)malloc(sizeof(struct node));
+    temp->id = n1->id;
+    strcpy(temp->name, n1->name);
+    temp->contact = n1->contact;
+    strcpy(temp->gender, n1->gender);
+    strcpy(temp->blood_group, n1->blood_group);
+    strcpy(temp->city, n1->city);
+    strcpy(temp->availability, n1->availability);
+    temp->next = NULL;
+    return temp;
+}
+void display(struct node **head);
+void insert_to_file(struct node temp)
+{
+   FILE *fp=fopen("Donors.txt","a");
+   if(fp==NULL)
+   {
+    printf("Error!Try Again later....\n");
+    return;
+   }
+   fprintf(fp,"%d|%s|%lld|%s|%s|%s|%s\n",temp.id,temp.name,temp.contact,temp.gender,temp.blood_group,temp.city,temp.availability);
+   fclose(fp);
+}
+void save_to_donor(struct node **head)
+{
+   FILE *fp=fopen("Donors.txt","w");
+   if(fp==NULL)
+   {
+    printf("Error!Try Again later....\n");
+    return;
+   }
+   struct node *temp=*head;
+   while(temp!=NULL)
+   {
+      fprintf(fp,"%d|%s|%lld|%s|%s|%s|%s\n",temp->id,temp->name,temp->contact,temp->gender,temp->blood_group,temp->city,temp->availability);
+      temp=temp->next;
+   }  
+   fclose(fp);
+}
+void load_from_donor(struct node **head)
+{
+   FILE *fp=fopen("Donors.txt","r");
+   
+   struct node n2;
+    while (fscanf(fp, "%d|%49[^\n|]|%lld|%9[^|]|%4[^|]|%19[^|]|%9[^\n]\n",
+                  &n2.id, n2.name, &n2.contact,
+                  n2.gender, n2.blood_group,
+                  n2.city, n2.availability) == 7)
+   {
+     struct node*temp=createnode(&n2),*itr=*head;
+     if(*head==NULL)
+     {
+        *head=temp;
+     }
+     else
+     {
+        while(itr->next!=NULL)
+        {
+            itr=itr->next;
+        }
+        itr->next=temp;
+      }
+   }  
+   fclose(fp);
+}
+void insert_donor(struct node**head)
+{
+    struct node n1;
+    printf("Enter donor's details:\n");
+    printf("Id:\n");
+    scanf("%d",&n1.id);
+    printf("Name:\n");
+    getchar();
+    fgets(n1.name,sizeof(n1.name),stdin);
+    n1.name[strcspn(n1.name,"\n")]='\0';
+    printf("Contact:\n");
+    scanf("%lld",&n1.contact);
+    printf("Gender:\n");
+    scanf("%s",n1.gender);
+    printf("Blood group:\n");
+    scanf("%s",n1.blood_group);
+    printf("City:\n");
+    scanf("%s",n1.city);
+    printf("Availability:\n");
+    scanf("%s",n1.availability);
+    insert_to_file(n1);
+
+    struct node*temp=createnode(&n1),*itr=*head;
+     if(*head==NULL)
+     {
+        *head=temp;
+     }
+     else
+     {
+        while(itr->next!=NULL)
+        {
+            itr=itr->next;
+        }
+        itr->next=temp;
+      }
+    printf("Donor added successfully!\n");
+}
+
+void update(struct node **head)
+{
+    if(*head==NULL)
+    {
+        printf("No donors available.\n");
+        return;
+    }
+    int id;
+    printf("Enter donor ID to update:");
+    scanf("%d",&id);
+    struct node*temp=*head;
+    while(temp!=NULL&&temp->id!=id)
+    {
+        temp=temp->next;
+    }
+    if(temp==NULL)
+    {
+        printf("Donor with ID %d not found.\n",id);
+        return;
+    }
+    int choice;
+    do
+    {
+        printf("\nWhich detail do you want to update?\n");
+        printf("1.Name\n");
+        printf("2.Contact\n");
+        printf("3.Gender\n");
+        printf("4.Blood group\n");
+        printf("5.city\n");
+        printf("6.Availability\n");
+        printf("7.Update All\n");
+        printf("8.Exit update\n");
+        printf("\n");
+        printf("Enter your choice:\n");
+        scanf("%d",&choice);
+        switch(choice)
+        {
+            case 1:
+             printf("Enter new name:\n");
+             getchar();
+             fgets(temp->name,sizeof(temp->name),stdin);
+             temp->name[strcspn(temp->name,"\n")]='\0';
+             break;
+            case 2:
+             printf("Enter new contact:\n");
+             scanf("%lld",&temp->contact);
+             break;
+            case 3:
+             printf("Enter new gender:\n");
+             scanf("%s",temp->gender);
+             break;
+            case 4:
+             printf("Enter new blood group:\n");
+             scanf("%s",temp->blood_group);
+             break;
+            case 5:
+             printf("Enter new city:\n");
+             scanf("%s",temp->city);
+             break;
+            case 6:
+             printf("Enter new availability:\n");
+             scanf("%s",temp->availability);
+             break;
+            case 7:
+             printf("Enter new name:\n");
+             getchar();
+             fgets(temp->name,sizeof(temp->name),stdin);
+             temp->name[strcspn(temp->name,"\n")]='\0';
+             printf("Enter new contact:\n");
+             scanf("%lld",temp->contact);
+             printf("Enter new gender:\n");
+             scanf("%s",temp->gender);
+             printf("Enter new blood group:\n");
+             scanf("%s",temp->blood_group);
+             printf("Enter new City:\n");
+             scanf("%s",temp->city);
+             printf("Enter new availability:\n");
+             scanf("%s",temp->availability);
+             break;
+            case 8:
+             printf("Exiting Update menu.\n");
+             break;
+            default:
+             printf("Invalid choice!\n");
+        }
+        if(choice>=1&&choice<=7)
+           printf("Donor Updated Successfully!\n");
+    }while(choice!=8);
+    save_to_donor(head);
+}
+
+void delete_from_id(struct node**head,int p)
+{
+    if(*head==NULL)
+    {
+        printf("No donors are available\n");
+        return;
+    }
+    struct node*temp=*head,*itr=NULL;
+    if((temp->id==p)&&(temp!=NULL))
+    {
+        *head=temp->next;
+        free(temp);
+        printf("Donor deleted successfully.\n");
+        save_to_donor(head);
+        return;
+    }
+    while(temp!=NULL&&temp->id!=p)
+    {
+        itr=temp; 
+        temp=temp->next;
+    }
+    if(temp==NULL)
+    {
+        printf("Donor with ID %d not found.\n",p);
+        return;
+    }
+    itr->next=temp->next;
+    printf("Donor deleted successfully.\n");
+    free(temp);
+    save_to_donor(head);
+}
+void display(struct node **head)
+{
+   struct node*itr=*head;
+    if(*head==NULL)
+    {
+        printf("No donor records available.\n");
+        return;
+    }
+    printf("------------------------------\n");
+    printf("Donor's Details:\n");
+    printf("------------------------------\n");
+    while(itr!=NULL)
+    {
+        printf("Id:%d\nName:%s\nContact no.%lld\nGender:%s\nBlood group:%s\nCity:%s\nAvailability:%s\n",itr->id,itr->name,itr->contact,itr->gender,itr->blood_group,itr->city,itr->availability);
+        printf("------------------------------\n");
+        itr=itr->next;
+    }
+}
+struct pnode
+{
+    int pid;
+    char name[50];
+    char gender[10];
+    char blood_group[5];
+    char city[20];
+    struct pnode *next;
+};
+struct pnode *front = NULL,*rear=NULL;
+
+struct pnode *createpnode(struct pnode *p1)
+{
+    struct pnode *temp = (struct pnode *)malloc(sizeof(struct pnode));
+    temp->pid = p1->pid;
+    strcpy(temp->name, p1->name);
+    strcpy(temp->gender, p1->gender);
+    strcpy(temp->blood_group, p1->blood_group);
+    strcpy(temp->city, p1->city);
+    temp->next = NULL;
+    return temp;
+}
+
+void insert_patient_to_file(struct pnode temp)
+{
+    FILE *fp = fopen("Patients.txt", "a");
+    if (fp == NULL)
+    {
+        printf("Error! Try Again later....\n");
+        return;
+    }
+    fprintf(fp, "%d|%s|%s|%s|%s\n", temp.pid, temp.name, temp.gender, temp.blood_group, temp.city);
+    fclose(fp);
+}
+
+void save_to_patient(struct pnode **front)
+{
+    FILE *fp = fopen("Patients.txt", "w");
+    if (fp == NULL)
+    {
+        printf("Error! Try Again later....\n");
+        return;
+    }
+    struct pnode *temp = *front;
+    while (temp != NULL)
+    {
+        fprintf(fp, "%d|%s|%s|%s|%s\n", temp->pid, temp->name, temp->gender, temp->blood_group, temp->city);
+        temp = temp->next;
+    }
+    fclose(fp);
+}
+
+void load_from_patient(struct pnode **front,struct pnode **rear)
+{
+    FILE *fp = fopen("Patients.txt", "r");
+    if (fp == NULL)
+        return;
+
+    struct pnode p2;
+    while (fscanf(fp, "%d|%49[^|]|%9[^|]|%4[^|]|%19[^\n]\n",
+                  &p2.pid, p2.name, p2.gender, p2.blood_group, p2.city) == 5)
+    {
+        struct pnode *temp = createpnode(&p2), *itr = *front;
+        if (*front == NULL)
+        {
+            *front=temp;
+            *rear=temp;
+        }
+        else
+        {
+            (*rear)->next=temp;
+            *rear=temp;
+        }
+    }
+    fclose(fp);
+}
+void delete_patient(struct pnode**front,struct pnode **rear)
+{
+    if(*front==NULL)
+    {
+        printf("----No Patients Available----\n");
+        return;
+    }    
+    struct pnode*temp=*front;
+    if(*front==*rear)
+    {
+         *front=NULL;
+         *rear=NULL;
+    }
+    else 
+      *front=(*front)->next;
+    printf("Patient deleted succesfully\n");
+    free(temp);
+}
+void insert_patient(struct pnode **front,struct pnode **rear)
+{
+    struct pnode p1;
+    printf("Enter patient's details:\n");
+    printf("Id:\n");
+    scanf("%d", &p1.pid);
+    printf("Name:\n");
+    getchar();
+    fgets(p1.name, sizeof(p1.name), stdin);
+    p1.name[strcspn(p1.name, "\n")] = '\0';
+    printf("Gender:\n");
+    scanf("%s", p1.gender);
+    printf("Blood group:\n");
+    scanf("%s", p1.blood_group);
+    printf("City:\n");
+    scanf("%s", p1.city);
+
+    insert_patient_to_file(p1);
+
+    struct pnode *temp = createpnode(&p1);
+    if(*front==NULL)
+    {
+        *front=temp;
+        *rear=temp;
+        return;
+    }
+    else
+    {
+        (*rear)->next=temp;
+        *rear=temp;
+    }
+    printf("Patient added successfully into queue!\n");
+}
+void display_patient(struct pnode **front)
+{
+    struct pnode *itr = *front;
+    if (*front== NULL)
+    {
+        printf("No patient records available.\n");
+        return;
+    }
+    printf("------------------------------\n");
+    printf("Patient's Details:\n");
+    printf("------------------------------\n");
+    while (itr != NULL)
+    {
+        printf("Id:%d\nName:%s\nGender:%s\nBlood group:%s\nCity:%s\n",
+               itr->pid, itr->name, itr->gender, itr->blood_group, itr->city);
+        printf("------------------------------\n");
+        itr = itr->next;
+    }
+}
+void search(struct node **head,struct pnode **front,struct pnode **rear)
+{
+    if(front==NULL)
+    {
+        printf("\nNo Patients available in queue!Enter a patient first.\n");
+        return;
+    }
+    int c;
+    printf("\nSearch by:\n1.Blood group\n2.City\n3.Both blood group and City\n");
+    scanf("%d",&c);
+    struct node *temp=*head;
+    struct pnode *patient=*front;
+    if(*head==NULL)
+    {
+        printf("----No donors available.----\n");
+        return;
+    }
+    int found=0;
+    if(c==1)
+    {
+    int match;
+     printf("------------------------------\n");
+     printf("Available Donors for Patient with id %d:\n",patient->pid);
+    
+    while(temp!=NULL)
+    {
+      match=0;
+    if (strcmp(patient->blood_group, "O-") == 0)
+    {
+        if(strcmp(temp->blood_group, "O-") == 0)
+            match=1;
+    }   
+    else if (strcmp(patient->blood_group, "O+") == 0)
+    {
+        if(strcmp(temp->blood_group, "O-") == 0 || strcmp(temp->blood_group, "O+") == 0) match=1;
+    }    
+    else if (strcmp(patient->blood_group, "A-") == 0)
+    {
+        if(strcmp(temp->blood_group, "A-") == 0 || strcmp(temp->blood_group, "O-") == 0) match=1;
+    }    
+    else if (strcmp(patient->blood_group, "A+") == 0)
+    {
+        if(strcmp(temp->blood_group, "A+") == 0 || strcmp(temp->blood_group, "A-") == 0 ||
+               strcmp(temp->blood_group, "O+") == 0 || strcmp(temp->blood_group, "O-") == 0) match=1;
+    }
+    else if (strcmp(patient->blood_group, "B-") == 0)
+    {
+        if(strcmp(temp->blood_group, "B-") == 0 || strcmp(temp->blood_group, "O-") == 0) match=1;
+    }    
+    else if (strcmp(patient->blood_group, "B+") == 0)
+        if(strcmp(temp->blood_group, "B+") == 0 || strcmp(temp->blood_group, "B-") == 0 ||
+               strcmp(temp->blood_group, "O+") == 0 || strcmp(temp->blood_group, "O-") == 0) match=1;
+    else if (strcmp(patient->blood_group, "AB-") == 0)
+        if(strcmp(temp->blood_group, "AB-") == 0 || strcmp(temp->blood_group, "A-") == 0 ||
+               strcmp(temp->blood_group, "B-") == 0 || strcmp(temp->blood_group, "O-") == 0) match=1;
+    else if (strcmp(patient->blood_group, "AB+") == 0) match=1; 
+   if(match==1)
+    {
+        found=1;
+        printf("------------------------------\n");
+        printf("\nId:%d\nName:%s\nContact no.%lld\nGender:%s\nBlood group:%s\nCity:%s\nAvailability:%s\n",temp->id,temp->name,temp->contact,temp->gender,temp->blood_group,temp->city,temp->availability);
+        printf("------------------------------\n");
+    }
+    temp=temp->next;
+  }
+  if(!found)
+  {
+    printf("\n******No donor found!Showing all available donors******\n");
+    display(head);
+  }
+ }
+ else if(c==2)
+    {
+    struct node *temp=*head;
+    int match=0;
+    printf("------------------------------\n");
+     printf("Available Donors for Patient with id %d:\n",patient->pid);
+    while(temp!=NULL)
+    {
+    if (strcmp(patient->city,temp->city) == 0)
+    {
+            match=1;
+            printf("------------------------------\n");
+            printf("\nId:%d\nName:%s\nContact no.%lld\nGender:%s\nBlood group:%s\nCity:%s\nAvailability:%s\n",temp->id,temp->name,temp->contact,temp->gender,temp->blood_group,temp->city,temp->availability);
+            printf("------------------------------\n");
+    }
+    temp=temp->next;
+  }
+  if(!match)
+  {
+    printf("\n-----No donor found!------\n");
+    printf("Available Donors:\n");
+    display(head);
+  }
+ }
+ else if(c==3)
+ {
+    struct node *temp=*head;
+    int match;
+     printf("------------------------------\n");
+     printf("Available Donors for Patient with id %d:\n",patient->pid);
+    
+    while(temp!=NULL)
+    {
+      match=0;
+      if(strcmp(patient->city,temp->city)==0)
+      {
+    if (strcmp(patient->blood_group, "O-") == 0)
+    {
+        if(strcmp(temp->blood_group, "O-") == 0)
+        {
+            match=1;
+        }    
+    }   
+    else if (strcmp(patient->blood_group, "O+") == 0)
+    {
+        if(strcmp(temp->blood_group, "O-") == 0 || strcmp(temp->blood_group, "O+") == 0) {match=1;
+        }
+    }    
+    else if (strcmp(patient->blood_group, "A-") == 0)
+    {
+        if(strcmp(temp->blood_group, "A-") == 0 || strcmp(temp->blood_group, "O-") == 0) {match=1;
+        }
+    }    
+    else if (strcmp(patient->blood_group, "A+") == 0)
+    {
+        if(strcmp(temp->blood_group, "A+") == 0 || strcmp(temp->blood_group, "A-") == 0 ||
+               strcmp(temp->blood_group, "O+") == 0 || strcmp(temp->blood_group, "O-") == 0){match=1;
+               }
+    }
+    else if (strcmp(patient->blood_group, "B-" )== 0)
+    {
+        if(strcmp(temp->blood_group, "B-") == 0 || strcmp(temp->blood_group, "O-") == 0) {match=1;
+        }
+    }    
+    else if (strcmp(patient->blood_group, "B+") == 0){
+        if(strcmp(temp->blood_group, "B+") == 0 || strcmp(temp->blood_group, "B-") == 0 ||
+               strcmp(temp->blood_group, "O+") == 0 || strcmp(temp->blood_group, "O-") == 0){ match=1;
+     }
+    }
+    else if (strcmp(patient->blood_group, "AB-") == 0){
+        if(strcmp(temp->blood_group, "AB-") == 0 || strcmp(temp->blood_group, "A-") == 0 ||
+               strcmp(temp->blood_group, "B-") == 0 || strcmp(temp->blood_group, "O-") == 0) {match=1;
+               }
+    }   
+    else if (strcmp(patient->blood_group, "AB+") == 0) {match=1; 
+    }
+   if(match==1)
+    {
+        found=1;
+        printf("\nId:%d\nName:%s\nContact no.%lld\nGender:%s\nBlood group:%s\nCity:%s\nAvailability:%s\n",temp->id,temp->name,temp->contact,temp->gender,temp->blood_group,temp->city,temp->availability);
+        printf("------------------------------\n");
+    }
+    }
+    temp=temp->next;
+  }
+  if(!found)
+  {
+    printf("------No donor found!------\n");
+    display(head);
+  }
+}
+else
+{
+    printf("\nInvalid choice!Try Again\n");
+}
+delete_patient(front,rear);
+save_to_patient(front);
+}
+int main()
+{
+    load_from_donor(&head);
+    load_from_patient(&front,&rear);
+    int c,val,i;
+    while(1)
+    {
+        printf("\n");
+        printf("Press...\n1.Insert Donor\n2.Update Donor\n");
+        printf("3.Delete Donor\n4.Search donor\n");
+        printf("5.Display Donor\n6.Insert patient\n7.Exit\n");
+        scanf("%d",&c);
+        switch(c)
+        {
+            case 1:
+              insert_donor(&head);
+              break;
+           case 2:
+              update(&head);
+              break;
+            case 3:
+              printf("Enter the donor id\n");
+              scanf("%d",&val);  
+              delete_from_id(&head,val);
+              break;
+            case 4:
+              search(&head,&front,&rear);
+              break;
+            case 5:
+              display(&head);
+              printf("\n");
+              break;
+            case 6:
+              insert_patient(&front,&rear);
+              break;
+            case 7:
+              printf("Thankyou for visiting the site\n");
+              exit(1);
+            default:
+              printf("Select a valid option:\n");
+         }
+    }
+    return 0;
+}# Blood-Donation-And-Emergency-Locator
